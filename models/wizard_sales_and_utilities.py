@@ -100,37 +100,32 @@ class WizardSalesandUtilities(models.TransientModel):
         groups = {}
         for invoice in AccountInvoice.search(invoices_filter):
             # TODO Filter
-            print(invoice.type)
-            if invoice.type in['out_invoice']:
-                for line in invoice.invoice_line_ids:
-                    if not line.product_id:
-                        continue
-                    if self.product_id and self.product_id != line.product_id:
-                        continue
-                    cost_unit = line.product_id.get_history_price(
-                        invoice.company_id.id, invoice.date or invoice.date_invoice)
-                    product_id = line.product_id.id
-                    group = (product_id, line.name)
+
+            for line in invoice.invoice_line_ids:
+                if not line.product_id:
+                    continue
+                if self.product_id and self.product_id != line.product_id:
+                    continue
+                cost_unit = line.product_id.get_history_price(
+                    invoice.company_id.id, invoice.date or invoice.date_invoice)
+                product_id = line.product_id.id
+                group = (product_id, line.name)
+                if invoice.type in['out_invoice']:
+                    print(invoice.type)
+                    print(line.name)
                     if not groups.get(group):
                         groups[group] = [0, 0, 0]
                     groups[group][0] += line.quantity
                     groups[group][1] += cost_unit
                     groups[group][2] += line.price_unit
-            if invoice.type in['out_refund']:
-                for line in invoice.invoice_line_ids:
-                    if not line.product_id:
-                        continue
-                    if self.product_id and self.product_id != line.product_id:
-                        continue
-                    cost_unit = line.product_id.get_history_price(
-                        invoice.company_id.id, invoice.date or invoice.date_invoice)
-                    product_id = line.product_id.id
-                    group = (product_id, line.name)
+                if invoice.type in['out_refund']:
                     if not groups.get(group):
+                        print(invoice.type)
+                        print(line.name)
                         groups[group] = [0, 0, 0]
-                    groups[group][0] += (-1 * line.quantity)
-                    groups[group][1] += (-1 * cost_unit)
-                    groups[group][2] += (-1 * line.price_unit)
+                        groups[group][0] += (-1 * line.quantity)
+                        groups[group][1] += cost_unit
+                        groups[group][2] += line.price_unit
             WizardSalesandUtilitiesRow = self.env['wizard_sales_and_utilities.row']
         for group, data in groups.items():
             WizardSalesandUtilitiesRow.create({
