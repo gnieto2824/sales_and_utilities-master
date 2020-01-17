@@ -44,16 +44,12 @@ class WizardSalesandUtilitiesRow(models.TransientModel):
     @api.onchange('cost_unit', 'qty')
     def _get_cost_total(self):
         for record in self:
-            print(record)
-            # if record.type == 'Credit Note':
-            # record.cost_total = (-1 * record.cost_unit) * record.qty
-            # else:
-            record.cost_total = record.cost_unit * record.qty
+            record.cost_total = record.cost_unit
 
     @api.onchange('price_unit', 'qty')
     def _get_price_total(self):
         for record in self:
-            record.price_total = record.price_unit * record.qty
+            record.price_total = record.price_unit
 
     @api.onchange('cost_total', 'price_total')
     def _get_utility(self):

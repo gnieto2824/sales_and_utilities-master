@@ -110,22 +110,17 @@ class WizardSalesandUtilities(models.TransientModel):
                     invoice.company_id.id, invoice.date or invoice.date_invoice)
                 product_id = line.product_id.id
                 group = (product_id, line.name)
+                if not groups.get(group):
+                    groups[group] = [0, 0, 0]
                 if invoice.type in['out_invoice']:
-                    print(invoice.type)
-                    print(line.name)
-                    if not groups.get(group):
-                        groups[group] = [0, 0, 0]
                     groups[group][0] += line.quantity
                     groups[group][1] += cost_unit
                     groups[group][2] += line.price_unit
                 if invoice.type in['out_refund']:
-                    if not groups.get(group):
-                        print(invoice.type)
-                        print(line.name)
-                        groups[group] = [0, 0, 0]
-                        groups[group][0] += (-1 * line.quantity)
-                        groups[group][1] += cost_unit
-                        groups[group][2] += line.price_unit
+                    groups[group][0] += (-1 * line.quantity)
+                    groups[group][1] += (-1 * cost_unit)
+                    groups[group][2] += (-1 * line.price_unit)
+
             WizardSalesandUtilitiesRow = self.env['wizard_sales_and_utilities.row']
         for group, data in groups.items():
             WizardSalesandUtilitiesRow.create({
