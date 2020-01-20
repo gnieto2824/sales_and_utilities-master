@@ -108,7 +108,11 @@ class WizardSalesandUtilities(models.TransientModel):
                     continue
                 cost_unit = line.product_id.get_history_price(
                     invoice.company_id.id, invoice.date or invoice.date_invoice)
+                # cost_unit = line.purchase_price
                 product_id = line.product_id.id
+                print(line.name)
+                print(line.quantity)
+                print(cost_unit)
                 group = (product_id, line.name)
                 if not groups.get(group):
                     groups[group] = [0, 0, 0]
